@@ -1,3 +1,4 @@
+'''
 email_service/
 │── email_service/
 │   ├── __init__.py
@@ -23,3 +24,4 @@ email_service/
 │── celery.py
 │── requirements.txt
 │── README.md
+'''
