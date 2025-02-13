@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Список рассылок</h1>
+<a href="{% url 'homepage' %}" class="btn btn-primary">На главную</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Тема</th>
+            <th>Дата отправки</th>
+            <th>Статус</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for mailing in mailings %}
+        <tr>
+            <td>{{ mailing.subject }}</td>
+            <td>{{ mailing.scheduled_time }}</td>
+            <td>{% if mailing.is_sent %}Отправлено{% else %}В ожидании{% endif %}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

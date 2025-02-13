@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Email Service</h1>
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createEmailModal">Создать рассылку</button>
+<a href="{% url 'subscriber_list' %}" class="btn btn-secondary">Список подписчиков</a>
+<a href="{% url 'email_list' %}" class="btn btn-info">Список рассылок</a>
+
+<form method="post" action="{% url 'upload_subscribers' %}" enctype="multipart/form-data" class="mt-4" id="upload-csv-form">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="csv_file" class="form-label">Загрузить подписчиков из CSV</label>
+        <input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv" required>
+        <small class="form-text text-muted">
+            Файл должен быть в формате CSV с колонками: <code>email,first_name,last_name,birthday</code>.
+            <br>Пример:
+            <pre>
+                email,first_name,last_name,birthday
+                john.doe@example.com,John,Doe,1990-01-01
+                jane.smith@example.com,Jane,Smith,1985-05-15
+            </pre>
+        </small>
+    </div>
+    <button type="submit" class="btn btn-success">Загрузить</button>
+</form>
+
+<div class="modal fade" id="createEmailModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Создать рассылку</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                {% include 'emails/create_email.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

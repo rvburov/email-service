@@ -1,0 +1,107 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+
+# Django specific
+*.local
+*.env
+*.dev
+db.sqlite3
+media/
+staticfiles/
+static/
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Translations
+*.mo
+*.pot
+
+# Docs
+docs/_build/
+
+# mypy
+.mypy_cache/
+
+# virtual environment
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environments files
+.env
+*.local
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS Trash
+.Trashes
+# macOS specific files
+._*
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# PyCharm
+.idea/
+
+# VSCode
+.vscode/
