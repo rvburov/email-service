@@ -8,6 +8,7 @@ from .tasks import send_mailing
 import logging
 from dateutil.parser import parse
 from datetime import datetime
+from django.utils import timezone
 import re
 
 # Настроим логгер, чтобы сообщения логгировались корректно
@@ -17,28 +18,52 @@ logger = logging.getLogger(__name__)
 def homepage(request):
     return render(request, 'emails/homepages.html')
 
+logger = logging.getLogger(__name__)
+
 def create_email(request):
     if request.method == 'POST':
         subject = request.POST.get('subject')
         template = request.POST.get('template')
         scheduled_time = request.POST.get('scheduled_time')
 
-        # Валидация даты и времени отправки
+        # Валидация даты и времени отправки, если указана
+        if scheduled_time:
+            try:
+                scheduled_time_parsed = timezone.make_aware(datetime.strptime(scheduled_time, '%Y-%m-%dT%H:%M'), timezone.get_current_timezone())
+                if scheduled_time_parsed < timezone.now():
+                    return JsonResponse({'error': 'Дата и время отправки должны быть в будущем'}, status=400)
+            except ValueError as e:
+                logger.error("Ошибка преобразования даты и времени: {}".format(e))
+                return JsonResponse({'error': 'Некорректный формат даты и времени'}, status=400)
+        else:
+            scheduled_time_parsed = timezone.now()  # Устанавливаем текущее время
+
+        # Преобразуем время в московское время перед записью в базу данных и Celery
+        scheduled_time_msk = scheduled_time_parsed.astimezone(timezone.get_current_timezone())
+
+        # Проверка списка подписчиков
+        if not Subscriber.objects.exists():
+            logger.info("Список подписчиков пустой")
+            return JsonResponse({'error': 'Список подписчиков пустой'}, status=400)
+
+        # Создание рассылки
         try:
-            scheduled_time_parsed = datetime.strptime(scheduled_time, '%Y-%m-%dT%H:%M')
-            if scheduled_time_parsed < datetime.now():
-                return JsonResponse({'error': 'Дата и время отправки должны быть в будущем'}, status=400)
-        except ValueError as e:
-            logger.error(u"Ошибка преобразования даты и времени: {}".format(e))
-            return JsonResponse({'error': 'Некорректный формат даты и времени'}, status=400)
+            mailing = Mailing.objects.create(
+                subject=subject,
+                template=template,
+                scheduled_time=scheduled_time_msk
+            )
+        except Exception as e:
+            logger.error("Ошибка при создании рассылки: {}".format(e))
+            return JsonResponse({'error': 'Ошибка при создании рассылки'}, status=500)
 
-        mailing = Mailing.objects.create(
-            subject=subject,
-            template=template,
-            scheduled_time=scheduled_time_parsed
-        )
+        # Запуск задачи Celery для отправки рассылки
+        try:
+            send_mailing.apply_async(args=[mailing.id], eta=scheduled_time_msk)
+        except Exception as e:
+            logger.error("Ошибка при запуске задачи Celery: {}".format(e))
+            return JsonResponse({'error': 'Ошибка при запуске задачи Celery'}, status=500)
 
-        send_mailing.apply_async(args=[mailing.id], eta=mailing.scheduled_time)
         return JsonResponse({'status': 'success'})
     return render(request, 'emails/create_email.html')
 

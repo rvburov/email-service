@@ -15,7 +15,7 @@
         {% for mailing in mailings %}
         <tr>
             <td>{{ mailing.subject }}</td>
-            <td>{{ mailing.scheduled_time }}</td>
+            <td>{{ mailing.scheduled_time|date:"d M Y, H:i" }}</td>
             <td>{% if mailing.is_sent %}Отправлено{% else %}В ожидании{% endif %}</td>
         </tr>
         {% endfor %}

@@ -93,6 +93,7 @@ venv.bak/
 
 # macOS Trash
 .Trashes
+
 # macOS specific files
 ._*
 
@@ -105,3 +106,7 @@ Desktop.ini
 
 # VSCode
 .vscode/
+
+# Игнорируем все PDF-файлы и CSV-файлы 
+*.pdf
+*.csv

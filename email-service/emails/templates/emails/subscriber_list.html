@@ -4,6 +4,7 @@
 
 {% block content %}
 <h1>Список подписчиков</h1>
+<a href="{% url 'homepage' %}" class="btn btn-primary">На главную</a>
 <form id="csrf-form">
     {% csrf_token %}
 </form>
@@ -31,7 +32,6 @@
         {% endfor %}
     </tbody>
 </table>
-<a href="{% url 'homepage' %}" class="btn btn-primary">На главную</a>
 
 <script src="{% static 'js/scripts.js' %}"></script>
 {% endblock %}
