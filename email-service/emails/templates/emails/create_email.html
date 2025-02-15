@@ -1,3 +1,5 @@
+{% load static %}
+
 <form id="create-email-form" method="post">
     {% csrf_token %}
     
@@ -5,13 +7,34 @@
         <label for="subject" class="form-label">Тема письма</label>
         <input type="text" class="form-control" id="subject" name="subject" required>
     </div>
+    
     <div class="mb-3">
-        <label for="template" class="form-label">HTML-шаблон</label>
-        <textarea class="form-control" id="template" name="template" rows="5" required></textarea>
+        <label for="template_option" class="form-label">Выберите шаблон</label>
+        <select class="form-control" id="template_option" name="template_option" onchange="toggleTemplateInput(this)">
+            <option value="custom">Свой HTML-текст</option>
+            <option value="predefined">Использовать готовый шаблон</option>
+        </select>
     </div>
+    
+    <div class="mb-3" id="custom_template_div">
+        <label for="template" class="form-label">HTML-шаблон</label>
+        <textarea class="form-control" id="template" name="template" rows="5"></textarea>
+    </div>
+    
+    <div class="mb-3" id="predefined_template_div" style="display: none;">
+        <label for="predefined_template" class="form-label">Готовый шаблон</label>
+        <select class="form-control" id="predefined_template" name="predefined_template">
+            <option value="templates_email.html">templates_email.html</option>
+            <option value="templates_email-2.html">templates_email-2.html</option>
+            <!-- добавить сюда дополнительные шаблоны -->
+        </select>
+    </div>
+    
     <div class="mb-3">
         <label for="scheduled_time" class="form-label">Дата и время отправки (необязательно)</label>
         <input type="datetime-local" class="form-control" id="scheduled_time" name="scheduled_time">
     </div>
     <button type="submit" class="btn btn-primary">Создать</button>
 </form>
+
+<script src="{% static 'js/scripts.js' %}"></script>

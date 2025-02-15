@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Специальное предложение для вас!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #28a745;
+            color: #fff;
+            padding: 15px;
+            font-size: 20px;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            padding: 20px;
+            font-size: 18px;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Эксклюзивное предложение!</div>
+        <div class="content">
+            <p>Здравствуйте, {{ first_name }} {{ last_name }}!</p>
+            <p>Мы ценим вас и хотим предложить вам особые условия. Только в течение ограниченного времени вы можете воспользоваться специальной скидкой!</p>
+            <p>Не упустите свой шанс. Свяжитесь с нами, чтобы узнать все детали.</p>
+        </div>
+        <div class="footer">&copy; 2025, Ваша компания</div>
+        <img src="{{ tracking_url }}" alt="" style="display:none;" />
+    </div>
+</body>
+</html>

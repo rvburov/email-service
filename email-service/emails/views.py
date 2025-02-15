@@ -10,6 +10,8 @@ from dateutil.parser import parse
 from datetime import datetime
 from django.utils import timezone
 import re
+import os
+import codecs
 
 # Настроим логгер, чтобы сообщения логгировались корректно
 logging.basicConfig(level=logging.INFO)
@@ -23,7 +25,19 @@ logger = logging.getLogger(__name__)
 def create_email(request):
     if request.method == 'POST':
         subject = request.POST.get('subject')
-        template = request.POST.get('template')
+        template_option = request.POST.get('template_option')
+        
+        if template_option == 'custom':
+            template = request.POST.get('template')
+        else:
+            predefined_template = request.POST.get('predefined_template')
+            template_path = os.path.join(os.path.dirname(__file__), 'templates/mailing', predefined_template)
+            if not os.path.exists(template_path):
+                logger.error("Файл шаблона не найден: {}".format(template_path))
+                return JsonResponse({'error': 'Файл шаблона не найден'}, status=404)
+            with codecs.open(template_path, 'r', encoding='utf-8') as file:
+                template = file.read()
+        
         scheduled_time = request.POST.get('scheduled_time')
 
         # Валидация даты и времени отправки, если указана
