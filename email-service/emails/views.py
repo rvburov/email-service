@@ -15,17 +15,20 @@ import codecs
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-# Настроим логгер, чтобы сообщения логгировались корректно
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def homepage(request):
+    """Отображает главную страницу сервиса рассылок."""
+
     return render(request, 'emails/homepages.html')
 
 logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def track_email_open(request, mailing_id, subscriber_id):
+    """Фиксирует факт открытия письма подписчиком."""
+
     logger.info("Запрос на отслеживание открытия: mailing_id={}, subscriber_id={}".format(mailing_id, subscriber_id))
     try:
         mailing_log = MailingLog.objects.get(mailing_id=mailing_id, subscriber_id=subscriber_id)
@@ -41,10 +44,13 @@ def track_email_open(request, mailing_id, subscriber_id):
         return HttpResponse(status=404)
 
 def create_email(request):
+    """Создаем новую email-рассылку на основе шаблона или пользовательского ввода."""
+
     if request.method == 'POST':
         subject = request.POST.get('subject')
         template_option = request.POST.get('template_option')
         
+        # Определение шаблона письма
         if template_option == 'custom':
             template = request.POST.get('template')
         else:
@@ -100,18 +106,26 @@ def create_email(request):
     return render(request, 'emails/create_email.html')
 
 def email_list(request):
+    """Отображает список всех рассылок."""
+
     mailings = Mailing.objects.all().prefetch_related('mailinglog_set')
     return render(request, 'emails/email_list.html', {'mailings': mailings})
 
 def subscriber_list(request):
+    """Отображает список подписчиков."""
+
     subscribers = Subscriber.objects.all()
     return render(request, 'emails/subscriber_list.html', {'subscribers': subscribers})
 
 def is_valid_email(email):
+    """Проверяет валидность email-адреса с помощью регулярного выражения."""
+
     regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(regex, email)
 
 def upload_subscribers(request):
+    """Загрузка подписчиков из CSV-файла."""
+
     if request.method == 'POST' and request.FILES.get('csv_file'):
         csv_file = TextIOWrapper(request.FILES['csv_file'].file, encoding='utf-8')
 
@@ -135,6 +149,7 @@ def upload_subscribers(request):
                     logger.warning(u"Некорректный email: {}".format(email))
                     continue
 
+                # Добавление подписчика, если он не существует
                 if not Subscriber.objects.filter(email=email).exists():
                     Subscriber.objects.create(
                         email=email,
@@ -155,6 +170,8 @@ def upload_subscribers(request):
     return redirect('homepage')
 
 def delete_subscriber(request, email):
+    """Удаляет подписчика из базы данных."""
+
     if request.method == 'POST':
         try:
             subscriber = Subscriber.objects.get(email=email)

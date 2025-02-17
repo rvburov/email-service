@@ -11,6 +11,8 @@ logger = logging.getLogger(__name__)
 
 @shared_task
 def send_mailing(mailing_id):
+    """Отправляет email-рассылку подписчикам и обновляет статус рассылки."""
+
     logger.info("Запущена задача send_mailing для рассылки с ID: {} (время по Москве: {})".format(mailing_id, timezone.localtime(timezone.now())))
     try:
         mailing = Mailing.objects.get(id=mailing_id)
@@ -26,8 +28,8 @@ def send_mailing(mailing_id):
                 html_content = mailing.template.replace("{{ first_name }}", subscriber.first_name)
                 html_content = html_content.replace("{{ last_name }}", subscriber.last_name)
                 html_content = html_content.replace("{{ birthday }}", str(subscriber.birthday))
-                html_content = html_content.replace("{{ mailing.id }}", str(mailing.id))  # Заменяем переменную mailing.id
-                html_content = html_content.replace("{{ subscriber.id }}", str(subscriber.id))  # Заменяем переменную subscriber.id
+                html_content = html_content.replace("{{ mailing.id }}", str(mailing.id))
+                html_content = html_content.replace("{{ subscriber.id }}", str(subscriber.id))
             except KeyError as e:
                 logger.error("Переменная не найдена в шаблоне: {}".format(e))
                 return JsonResponse({'error': 'Переменная не найдена в шаблоне'}, status=400)
