@@ -5,6 +5,7 @@ from django.core.mail import EmailMultiAlternatives
 from .models import Mailing, Subscriber, MailingLog
 from django.utils import timezone
 from django.conf import settings
+from django.http import JsonResponse
 
 logger = logging.getLogger(__name__)
 
@@ -20,10 +21,18 @@ def send_mailing(mailing_id):
             return
 
         for subscriber in subscribers:
-            html_content = mailing.template.replace("{{ first_name }}", subscriber.first_name)
-            html_content = html_content.replace("{{ last_name }}", subscriber.last_name)
-            html_content = html_content.replace("{{ birthday }}", str(subscriber.birthday))
+            # Заменяем переменные в шаблоне
+            try:
+                html_content = mailing.template.replace("{{ first_name }}", subscriber.first_name)
+                html_content = html_content.replace("{{ last_name }}", subscriber.last_name)
+                html_content = html_content.replace("{{ birthday }}", str(subscriber.birthday))
+                html_content = html_content.replace("{{ mailing.id }}", str(mailing.id))  # Заменяем переменную mailing.id
+                html_content = html_content.replace("{{ subscriber.id }}", str(subscriber.id))  # Заменяем переменную subscriber.id
+            except KeyError as e:
+                logger.error("Переменная не найдена в шаблоне: {}".format(e))
+                return JsonResponse({'error': 'Переменная не найдена в шаблоне'}, status=400)
 
+            # Отправка письма
             msg = EmailMultiAlternatives(
                 mailing.subject,
                 html_content,
@@ -33,7 +42,12 @@ def send_mailing(mailing_id):
             msg.attach_alternative(html_content, "text/html")
             msg.send()
 
-            MailingLog.objects.create(mailing=mailing, subscriber=subscriber)
+            # Создаем лог для каждого подписчика
+            log, created = MailingLog.objects.get_or_create(mailing=mailing, subscriber=subscriber)
+            if created:
+                logger.info("Создан новый лог: mailing_id={}, subscriber_id={}".format(mailing.id, subscriber.id))
+            else:
+                logger.info("Лог уже существует: mailing_id={}, subscriber_id={}".format(mailing.id, subscriber.id))
 
         # Обновление статуса рассылки
         mailing.is_sent = True

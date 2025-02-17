@@ -12,6 +12,8 @@ from django.utils import timezone
 import re
 import os
 import codecs
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
 # Настроим логгер, чтобы сообщения логгировались корректно
 logging.basicConfig(level=logging.INFO)
@@ -21,6 +23,22 @@ def homepage(request):
     return render(request, 'emails/homepages.html')
 
 logger = logging.getLogger(__name__)
+
+@csrf_exempt
+def track_email_open(request, mailing_id, subscriber_id):
+    logger.info("Запрос на отслеживание открытия: mailing_id={}, subscriber_id={}".format(mailing_id, subscriber_id))
+    try:
+        mailing_log = MailingLog.objects.get(mailing_id=mailing_id, subscriber_id=subscriber_id)
+        logger.info("Найдена запись лога: mailing_id={}, subscriber_id={}, opened_at={}".format(
+            mailing_log.mailing_id, mailing_log.subscriber_id, mailing_log.opened_at))
+        if not mailing_log.opened_at:
+            mailing_log.opened_at = timezone.now()
+            mailing_log.save()
+            logger.info("Статус прочтения обновлен для mailing_id={}, subscriber_id={}".format(mailing_id, subscriber_id))
+        return HttpResponse(status=200)
+    except MailingLog.DoesNotExist:
+        logger.error("Лог не найден: mailing_id={}, subscriber_id={}".format(mailing_id, subscriber_id))
+        return HttpResponse(status=404)
 
 def create_email(request):
     if request.method == 'POST':
@@ -82,7 +100,7 @@ def create_email(request):
     return render(request, 'emails/create_email.html')
 
 def email_list(request):
-    mailings = Mailing.objects.all()
+    mailings = Mailing.objects.all().prefetch_related('mailinglog_set')
     return render(request, 'emails/email_list.html', {'mailings': mailings})
 
 def subscriber_list(request):

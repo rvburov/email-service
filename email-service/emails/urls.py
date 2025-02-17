@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^subscriber-list/$', views.subscriber_list, name='subscriber_list'),
     url(r'^upload-subscribers/$', views.upload_subscribers, name='upload_subscribers'),
     url(r'^delete-subscriber/(?P<email>[^/]+)$', views.delete_subscriber, name='delete_subscriber'),
+    url(r'^track-open/(?P<mailing_id>\d+)/(?P<subscriber_id>\d+)/$', views.track_email_open, name='track_email_open'),
 ]
