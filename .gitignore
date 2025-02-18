@@ -110,3 +110,6 @@ Desktop.ini
 # Игнорируем все PDF-файлы и CSV-файлы 
 *.pdf
 *.csv
+
+# Игнорируем файлы Redis
+dump.rdb

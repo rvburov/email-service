@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+"""Конфигурация административной панели для моделей."""
+
 from django.contrib import admin
 from .models import Subscriber, Mailing, MailingLog
 
@@ -36,4 +38,3 @@ class MailingLogAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('mailing', 'subscriber')
-
