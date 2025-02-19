@@ -77,6 +77,33 @@ pip install -r requirements.txt
 cp .env.example .env
 nano .env  # или используйте любой текстовый редактор
 ```
+#### **Пример `.env.example`**
+```ini
+# .env.example
+# Файл примера для настройки переменных окружения.
+
+# Безопасность
+SECRET_KEY="your-secret-key"
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# База данных (SQLite, PostgreSQL или MySQL)
+DATABASE_ENGINE=django.db.backends.sqlite3
+DATABASE_NAME=db.sqlite3
+
+# Настройки Celery и Redis
+CELERY_BROKER_URL=redis://localhost:6379/0
+CELERY_RESULT_BACKEND=redis://localhost:6379/0
+
+# Настройки Email
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=465
+EMAIL_USE_SSL=True
+EMAIL_HOST_USER=your_email@example.com
+EMAIL_HOST_PASSWORD=your_email_password
+DEFAULT_FROM_EMAIL=your_email@example.com
+```
 
 ### 5. Применение миграций и создание суперпользователя
 ```sh
@@ -120,17 +147,9 @@ sudo systemctl start redis
 celery -A email-service worker --loglevel=info
 ```
 
-## Важные библиотеки
-
-- **Django** – веб-фреймворк для серверной части приложения.
-- **Celery** – управление задачами для асинхронной отправки email-рассылок.
-- **Redis** – брокер сообщений для Celery.
-- **pandas** – анализ данных.
-- **numpy** – научные вычисления.
-
 ## Используемые технологии
 
 - **Python/Django** — Backend
 - **Celery + Redis** — Асинхронные задачи
 - **Bootstrap + jQuery** — UI
-- **SQLite/PostgreSQL** — База данных
+- **SQLite** — База данных
